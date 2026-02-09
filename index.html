@@ -3,10 +3,242 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>francisreal.com</title>
+    <meta
+      name="description"
+      content="Francis Real — Product-minded builder working on thoughtful, human-centered digital experiences."
+    />
+    <title>Francis Real | Product Builder</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0f172a;
+        --panel: #111827;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --accent-strong: #0ea5e9;
+        --border: rgba(148, 163, 184, 0.2);
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #1e293b, #0b1120 65%);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2.5rem 6vw 1.5rem;
+      }
+
+      .logo {
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .nav {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      .nav a:hover {
+        color: var(--text);
+      }
+
+      main {
+        padding: 0 6vw 5rem;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 2.5rem;
+        padding: 3rem 0 4rem;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.2rem, 4vw, 3.2rem);
+        line-height: 1.1;
+        margin-bottom: 1rem;
+      }
+
+      .hero p {
+        font-size: 1.05rem;
+        color: var(--muted);
+      }
+
+      .eyebrow {
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+      }
+
+      .cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.7);
+        transition: all 0.2s ease;
+      }
+
+      .button.primary {
+        background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+        color: #0b1120;
+        font-weight: 600;
+        border: none;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(14, 165, 233, 0.25);
+      }
+
+      .panel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .panel {
+        background: rgba(17, 24, 39, 0.7);
+        border: 1px solid var(--border);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        backdrop-filter: blur(12px);
+      }
+
+      .panel h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .panel p {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .list {
+        margin-top: 1rem;
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .list a {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.65rem 0.9rem;
+        border-radius: 0.9rem;
+        border: 1px solid transparent;
+        background: rgba(30, 41, 59, 0.6);
+        transition: border 0.2s ease;
+      }
+
+      .list a:hover {
+        border-color: var(--border);
+      }
+
+      footer {
+        margin-top: 4rem;
+        padding: 2rem 6vw 3rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border);
+      }
+
+      @media (max-width: 720px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>francisreal.com</h1>
-    <p>Hosted on GitHub Pages.</p>
+    <header>
+      <div class="logo">Francis Real</div>
+      <nav class="nav">
+        <a href="#work">Work</a>
+        <a href="#writing">Writing</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Hello, I’m Francis.</p>
+          <h1>Product-minded builder crafting calm, human-centered digital experiences.</h1>
+          <p>
+            I design and ship experiences that feel intentional, from early-stage product strategy to polished
+            UI delivery. Currently exploring the intersection of storytelling, community, and thoughtful
+            product execution.
+          </p>
+          <div class="cta">
+            <a class="button primary" href="mailto:hello@francisreal.com">Let’s collaborate</a>
+            <a class="button" href="#work">View recent work</a>
+          </div>
+        </div>
+        <div class="panel" aria-label="Quick profile">
+          <h2>Now</h2>
+          <p>Building personal projects and advising teams on product clarity.</p>
+          <div class="list" id="contact">
+            <a href="https://www.linkedin.com" target="_blank" rel="noreferrer">
+              LinkedIn <span>↗</span>
+            </a>
+            <a href="https://github.com" target="_blank" rel="noreferrer">GitHub <span>↗</span></a>
+            <a href="mailto:hello@francisreal.com">hello@francisreal.com</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-grid" id="work">
+        <article class="panel">
+          <h2>Product strategy</h2>
+          <p>Partnering with founders to clarify product narratives, MVP scope, and launch messaging.</p>
+        </article>
+        <article class="panel">
+          <h2>Design systems</h2>
+          <p>Establishing visual languages and UI foundations that scale across teams and platforms.</p>
+        </article>
+        <article class="panel" id="writing">
+          <h2>Writing & speaking</h2>
+          <p>Sharing lessons on building with empathy, momentum, and a clear point of view.</p>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <p>Available for select collaborations in 2024. Let’s build something honest and enduring.</p>
+    </footer>
   </body>
 </html>

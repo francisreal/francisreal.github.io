@@ -33,14 +33,18 @@
 
       body {
         min-height: 100vh;
+        min-height: 100svh;
         background: var(--void);
         color: var(--ink);
         font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
         overflow: hidden;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+          env(safe-area-inset-left);
       }
 
       .dvd {
         position: absolute;
+        font-size: clamp(1.4rem, 4vw, 2.6rem);
         left: 10vw;
         top: 20vh;
         font-size: clamp(1.8rem, 3vw, 3rem);
@@ -53,6 +57,7 @@
         translate: var(--x) var(--y);
         transition: color 0.2s ease;
         will-change: transform;
+        touch-action: manipulation;
         transition: color 0.2s ease;
       }
 
@@ -89,6 +94,10 @@
 
       const clampPosition = () => {
         const bounds = dvd.getBoundingClientRect();
+        const maxX = Math.max(0, window.innerWidth - bounds.width);
+        const maxY = Math.max(0, window.innerHeight - bounds.height);
+        state.x = Math.min(Math.max(0, state.x), maxX);
+        state.y = Math.min(Math.max(0, state.y), maxY);
         state.x = Math.min(Math.max(0, state.x), window.innerWidth - bounds.width);
         state.y = Math.min(Math.max(0, state.y), window.innerHeight - bounds.height);
       };

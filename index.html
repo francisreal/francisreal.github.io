@@ -45,6 +45,9 @@
       .dvd {
         position: absolute;
         font-size: clamp(1.4rem, 4vw, 2.6rem);
+        left: 10vw;
+        top: 20vh;
+        font-size: clamp(1.8rem, 3vw, 3rem);
         letter-spacing: 0.08em;
         text-transform: lowercase;
         color: var(--ink);
@@ -55,6 +58,7 @@
         transition: color 0.2s ease;
         will-change: transform;
         touch-action: manipulation;
+        transition: color 0.2s ease;
       }
 
       .dvd:hover {
@@ -94,6 +98,8 @@
         const maxY = Math.max(0, window.innerHeight - bounds.height);
         state.x = Math.min(Math.max(0, state.x), maxX);
         state.y = Math.min(Math.max(0, state.y), maxY);
+        state.x = Math.min(Math.max(0, state.x), window.innerWidth - bounds.width);
+        state.y = Math.min(Math.max(0, state.y), window.innerHeight - bounds.height);
       };
 
       const tick = (now) => {
@@ -122,6 +128,28 @@
 
         setPosition(state.x, state.y);
         requestAnimationFrame(tick);
+      let x = window.innerWidth * 0.1;
+      let y = window.innerHeight * 0.2;
+      let vx = 2.2;
+      let vy = 1.8;
+
+      const updatePosition = () => {
+        const bounds = dvd.getBoundingClientRect();
+        x += vx;
+        y += vy;
+
+        if (x <= 0 || x + bounds.width >= window.innerWidth) {
+          vx *= -1;
+          x = Math.max(0, Math.min(x, window.innerWidth - bounds.width));
+        }
+
+        if (y <= 0 || y + bounds.height >= window.innerHeight) {
+          vy *= -1;
+          y = Math.max(0, Math.min(y, window.innerHeight - bounds.height));
+        }
+
+        dvd.style.transform = `translate(${x}px, ${y}px)`;
+        requestAnimationFrame(updatePosition);
       };
 
       const repelFrom = (clientX, clientY) => {
@@ -137,6 +165,12 @@
       };
 
       dvd.addEventListener("pointerdown", (event) => {
+        const boost = 6;
+        vx = (dx / magnitude) * boost;
+        vy = (dy / magnitude) * boost;
+      };
+
+      dvd.addEventListener("click", (event) => {
         repelFrom(event.clientX, event.clientY);
       });
 
@@ -159,6 +193,11 @@
       clampPosition();
       setPosition(state.x, state.y);
       requestAnimationFrame(tick);
+        x = Math.min(x, window.innerWidth - dvd.offsetWidth);
+        y = Math.min(y, window.innerHeight - dvd.offsetHeight);
+      });
+
+      updatePosition();
     </script>
   </body>
 </html>

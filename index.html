@@ -3,10 +3,162 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>francisreal.com</title>
+    <meta name="description" content="Francis Real — minimal experiment." />
+    <title>Francis Real</title>
+    <style>
+      @property --x {
+        syntax: "<length>";
+        inherits: false;
+        initial-value: 0px;
+      }
+
+      @property --y {
+        syntax: "<length>";
+        inherits: false;
+        initial-value: 0px;
+      }
+
+      :root {
+        color-scheme: only dark;
+        --ink: #ffffff;
+        --void: #000000;
+        --neon: #39ff14;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        min-height: 100svh;
+        background: var(--void);
+        color: var(--ink);
+        font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+        overflow: hidden;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+          env(safe-area-inset-left);
+      }
+
+      .dvd {
+        position: absolute;
+        font-size: clamp(1.4rem, 4vw, 2.6rem);
+        letter-spacing: 0.08em;
+        text-transform: lowercase;
+        color: var(--ink);
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        translate: var(--x) var(--y);
+        transition: color 0.2s ease;
+        will-change: transform;
+        touch-action: manipulation;
+      }
+
+      .dvd:hover {
+        color: var(--neon);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .dvd {
+          transition: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>francisreal.com</h1>
-    <p>Hosted on GitHub Pages.</p>
+    <div class="dvd" role="button" tabindex="0">hi, my name is francis</div>
+
+    <script>
+      const dvd = document.querySelector(".dvd");
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const state = {
+        x: window.innerWidth * 0.1,
+        y: window.innerHeight * 0.2,
+        vx: 160,
+        vy: 130,
+        last: performance.now(),
+        running: !prefersReduced.matches,
+      };
+
+      const setPosition = (x, y) => {
+        dvd.style.setProperty("--x", `${x}px`);
+        dvd.style.setProperty("--y", `${y}px`);
+      };
+
+      const clampPosition = () => {
+        const bounds = dvd.getBoundingClientRect();
+        const maxX = Math.max(0, window.innerWidth - bounds.width);
+        const maxY = Math.max(0, window.innerHeight - bounds.height);
+        state.x = Math.min(Math.max(0, state.x), maxX);
+        state.y = Math.min(Math.max(0, state.y), maxY);
+      };
+
+      const tick = (now) => {
+        if (!state.running) {
+          state.last = now;
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        const delta = Math.min((now - state.last) / 1000, 0.032);
+        state.last = now;
+        const bounds = dvd.getBoundingClientRect();
+
+        state.x += state.vx * delta;
+        state.y += state.vy * delta;
+
+        if (state.x <= 0 || state.x + bounds.width >= window.innerWidth) {
+          state.vx *= -1;
+          state.x = Math.min(Math.max(0, state.x), window.innerWidth - bounds.width);
+        }
+
+        if (state.y <= 0 || state.y + bounds.height >= window.innerHeight) {
+          state.vy *= -1;
+          state.y = Math.min(Math.max(0, state.y), window.innerHeight - bounds.height);
+        }
+
+        setPosition(state.x, state.y);
+        requestAnimationFrame(tick);
+      };
+
+      const repelFrom = (clientX, clientY) => {
+        const rect = dvd.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = centerX - clientX;
+        const dy = centerY - clientY;
+        const magnitude = Math.hypot(dx, dy) || 1;
+        const boost = 240;
+        state.vx = (dx / magnitude) * boost;
+        state.vy = (dy / magnitude) * boost;
+      };
+
+      dvd.addEventListener("pointerdown", (event) => {
+        repelFrom(event.clientX, event.clientY);
+      });
+
+      dvd.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          const rect = dvd.getBoundingClientRect();
+          repelFrom(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        clampPosition();
+        setPosition(state.x, state.y);
+      });
+
+      prefersReduced.addEventListener("change", (event) => {
+        state.running = !event.matches;
+      });
+
+      clampPosition();
+      setPosition(state.x, state.y);
+      requestAnimationFrame(tick);
+    </script>
   </body>
 </html>

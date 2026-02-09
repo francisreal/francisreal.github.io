@@ -127,6 +127,27 @@
         mix-blend-mode: exclusion;
       }
 
+      @media (pointer: coarse) {
+        .cursor-dot,
+        .cursor-ring {
+          display: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+
+        .grid,
+        .field,
+        .pulse {
+          animation: none;
+        }
+      }
+
       @keyframes drift {
         0% {
           transform: translate(-2%, -2%);

@@ -41,6 +41,8 @@
 
       .dvd {
         position: absolute;
+        left: 10vw;
+        top: 20vh;
         font-size: clamp(1.8rem, 3vw, 3rem);
         letter-spacing: 0.08em;
         text-transform: lowercase;
@@ -51,6 +53,7 @@
         translate: var(--x) var(--y);
         transition: color 0.2s ease;
         will-change: transform;
+        transition: color 0.2s ease;
       }
 
       .dvd:hover {
@@ -116,6 +119,28 @@
 
         setPosition(state.x, state.y);
         requestAnimationFrame(tick);
+      let x = window.innerWidth * 0.1;
+      let y = window.innerHeight * 0.2;
+      let vx = 2.2;
+      let vy = 1.8;
+
+      const updatePosition = () => {
+        const bounds = dvd.getBoundingClientRect();
+        x += vx;
+        y += vy;
+
+        if (x <= 0 || x + bounds.width >= window.innerWidth) {
+          vx *= -1;
+          x = Math.max(0, Math.min(x, window.innerWidth - bounds.width));
+        }
+
+        if (y <= 0 || y + bounds.height >= window.innerHeight) {
+          vy *= -1;
+          y = Math.max(0, Math.min(y, window.innerHeight - bounds.height));
+        }
+
+        dvd.style.transform = `translate(${x}px, ${y}px)`;
+        requestAnimationFrame(updatePosition);
       };
 
       const repelFrom = (clientX, clientY) => {
@@ -131,6 +156,12 @@
       };
 
       dvd.addEventListener("pointerdown", (event) => {
+        const boost = 6;
+        vx = (dx / magnitude) * boost;
+        vy = (dy / magnitude) * boost;
+      };
+
+      dvd.addEventListener("click", (event) => {
         repelFrom(event.clientX, event.clientY);
       });
 
@@ -153,6 +184,11 @@
       clampPosition();
       setPosition(state.x, state.y);
       requestAnimationFrame(tick);
+        x = Math.min(x, window.innerWidth - dvd.offsetWidth);
+        y = Math.min(y, window.innerHeight - dvd.offsetHeight);
+      });
+
+      updatePosition();
     </script>
   </body>
 </html>

@@ -3,6 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Francis Real — a minimal, experimental page." />
+    <title>Francis Real — Experiment</title>
+    <style>
+      :root {
+        color-scheme: only dark;
+        --ink: #f8f8f8;
+        --void: #050505;
+        --neon: #39ff14;
+        --muted: rgba(248, 248, 248, 0.5);
     <meta
       name="description"
       content="Francis Real — Product-minded builder working on thoughtful, human-centered digital experiences."
@@ -29,6 +38,179 @@
 
       body {
         min-height: 100vh;
+        background: var(--void);
+        color: var(--ink);
+        font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
+      main {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        padding: 6vh 8vw;
+      }
+
+      h1 {
+        font-size: clamp(2.8rem, 6vw, 5rem);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        font-size: 1.05rem;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .accent {
+        color: var(--neon);
+      }
+
+      .field {
+        position: absolute;
+        inset: -30vh -30vw;
+        background:
+          radial-gradient(circle at 20% 30%, rgba(57, 255, 20, 0.15), transparent 40%),
+          radial-gradient(circle at 70% 60%, rgba(57, 255, 20, 0.1), transparent 45%),
+          linear-gradient(120deg, rgba(248, 248, 248, 0.03), rgba(248, 248, 248, 0.01));
+        filter: blur(0px);
+        animation: drift 18s linear infinite;
+      }
+
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(57, 255, 20, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(57, 255, 20, 0.08) 1px, transparent 1px);
+        background-size: 40px 40px;
+        opacity: 0.12;
+        transform: perspective(800px) rotateX(68deg) translateY(20vh);
+        transform-origin: center;
+        animation: grid-flow 12s ease-in-out infinite;
+      }
+
+      .pulse {
+        position: absolute;
+        width: 50vmax;
+        height: 50vmax;
+        border-radius: 50%;
+        border: 1px solid rgba(57, 255, 20, 0.2);
+        animation: pulse 8s ease-in-out infinite;
+      }
+
+      .cursor-dot,
+      .cursor-ring {
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        mix-blend-mode: exclusion;
+      }
+
+      .cursor-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--neon);
+      }
+
+      .cursor-ring {
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--neon);
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        opacity: 0.5;
+      }
+
+      .ripple {
+        position: fixed;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 1px solid var(--neon);
+        transform: translate(-50%, -50%) scale(0.2);
+        pointer-events: none;
+        animation: ripple 0.8s ease-out forwards;
+        z-index: 3;
+        mix-blend-mode: exclusion;
+      }
+
+      @media (pointer: coarse) {
+        .cursor-dot,
+        .cursor-ring {
+          display: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+
+        .grid,
+        .field,
+        .pulse {
+          animation: none;
+        }
+      }
+
+      @keyframes drift {
+        0% {
+          transform: translate(-2%, -2%);
+        }
+        50% {
+          transform: translate(2%, 3%);
+        }
+        100% {
+          transform: translate(-2%, -2%);
+        }
+      }
+
+      @keyframes grid-flow {
+        0% {
+          transform: perspective(800px) rotateX(68deg) translateY(18vh);
+        }
+        50% {
+          transform: perspective(800px) rotateX(65deg) translateY(22vh);
+        }
+        100% {
+          transform: perspective(800px) rotateX(68deg) translateY(18vh);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.9);
+          opacity: 0.2;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 0.35;
+        }
+        100% {
+          transform: scale(0.9);
+          opacity: 0.2;
+        }
+      }
+
+      @keyframes ripple {
+        0% {
+          opacity: 0.9;
+          transform: translate(-50%, -50%) scale(0.2);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(5);
         background: radial-gradient(circle at top, #1e293b, #0b1120 65%);
         color: var(--text);
         line-height: 1.6;
@@ -184,6 +366,55 @@
     </style>
   </head>
   <body>
+    <div class="field" aria-hidden="true"></div>
+    <div class="grid" aria-hidden="true"></div>
+    <div class="pulse" aria-hidden="true"></div>
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="cursor-ring" aria-hidden="true"></div>
+
+    <main>
+      <h1>Francis <span class="accent">Real</span></h1>
+      <p>This page is an <span class="accent">experiment</span>.</p>
+    </main>
+
+    <script>
+      const dot = document.querySelector(".cursor-dot");
+      const ring = document.querySelector(".cursor-ring");
+      let ringX = 0;
+      let ringY = 0;
+
+      const moveRing = () => {
+        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+        requestAnimationFrame(moveRing);
+      };
+
+      document.addEventListener("mousemove", (event) => {
+        const { clientX, clientY } = event;
+        dot.style.transform = `translate(${clientX}px, ${clientY}px) translate(-50%, -50%)`;
+        ringX += (clientX - ringX) * 0.12;
+        ringY += (clientY - ringY) * 0.12;
+      });
+
+      document.addEventListener("mousedown", () => {
+        ring.style.transform += " scale(0.8)";
+        ring.style.opacity = "0.9";
+      });
+
+      document.addEventListener("mouseup", () => {
+        ring.style.opacity = "0.5";
+      });
+
+      document.addEventListener("click", (event) => {
+        const ripple = document.createElement("span");
+        ripple.className = "ripple";
+        ripple.style.left = `${event.clientX}px`;
+        ripple.style.top = `${event.clientY}px`;
+        document.body.appendChild(ripple);
+        ripple.addEventListener("animationend", () => ripple.remove());
+      });
+
+      moveRing();
+    </script>
     <header>
       <div class="logo">Francis Real</div>
       <nav class="nav">

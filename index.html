@@ -3,10 +3,251 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>francisreal.com</title>
+    <meta name="description" content="Francis Real — minimal experiment." />
+    <title>Francis Real</title>
+    <style>
+      @property --x {
+        syntax: "<length>";
+        inherits: false;
+        initial-value: 0px;
+      }
+
+      @property --y {
+        syntax: "<length>";
+        inherits: false;
+        initial-value: 0px;
+      }
+
+      :root {
+        color-scheme: only dark;
+        --ink: #ffffff;
+        --void: #000000;
+        --neon: #39ff14;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        min-height: 100svh;
+        background: var(--void);
+        color: var(--ink);
+        font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+        overflow: hidden;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+          env(safe-area-inset-left);
+      }
+
+      .dvd {
+        position: absolute;
+        font-size: clamp(1.4rem, 4vw, 2.6rem);
+        letter-spacing: 0.08em;
+        text-transform: lowercase;
+        color: var(--ink);
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        translate: var(--x) var(--y);
+        transition: color 0.2s ease;
+        will-change: transform;
+        touch-action: manipulation;
+        perspective: 800px;
+      }
+
+      .dvd:hover {
+        color: var(--neon);
+      }
+
+      .word {
+        display: inline-flex;
+        gap: 0.15em;
+      }
+
+      .letter {
+        display: inline-block;
+        transition: transform 0.25s ease, color 0.25s ease;
+        transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotateZ(var(--r, 0deg));
+      }
+
+      .letter.shatter {
+        animation: shatter 0.9s ease-out forwards;
+      }
+
+      @keyframes shatter {
+        0% {
+          transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotateZ(var(--r, 0deg));
+          opacity: 1;
+        }
+        100% {
+          transform: translate3d(var(--sx), var(--sy), 0) rotateZ(var(--sr));
+          opacity: 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .dvd {
+          transition: none;
+        }
+
+        .letter {
+          transition: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>francisreal.com</h1>
-    <p>Hosted on GitHub Pages.</p>
+    <div class="dvd" role="button" tabindex="0" aria-label="hi, my name is francis">
+      <span class="word" aria-hidden="true"></span>
+    </div>
+
+    <script>
+      const text = "hi, my name is francis";
+      const dvd = document.querySelector(".dvd");
+      const word = dvd.querySelector(".word");
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const state = {
+        x: window.innerWidth * 0.1,
+        y: window.innerHeight * 0.2,
+        vx: 160,
+        vy: 130,
+        last: performance.now(),
+        running: !prefersReduced.matches,
+      };
+
+      const buildLetters = () => {
+        word.textContent = "";
+        [...text].forEach((char) => {
+          const span = document.createElement("span");
+          span.className = "letter";
+          span.textContent = char;
+          word.appendChild(span);
+        });
+      };
+
+      const setPosition = (x, y) => {
+        dvd.style.setProperty("--x", `${x}px`);
+        dvd.style.setProperty("--y", `${y}px`);
+      };
+
+      const clampPosition = () => {
+        const bounds = dvd.getBoundingClientRect();
+        const maxX = Math.max(0, window.innerWidth - bounds.width);
+        const maxY = Math.max(0, window.innerHeight - bounds.height);
+        state.x = Math.min(Math.max(0, state.x), maxX);
+        state.y = Math.min(Math.max(0, state.y), maxY);
+      };
+
+      const tick = (now) => {
+        if (!state.running) {
+          state.last = now;
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        const delta = Math.min((now - state.last) / 1000, 0.032);
+        state.last = now;
+        const bounds = dvd.getBoundingClientRect();
+
+        state.x += state.vx * delta;
+        state.y += state.vy * delta;
+
+        if (state.x <= 0 || state.x + bounds.width >= window.innerWidth) {
+          state.vx *= -1;
+          state.x = Math.min(Math.max(0, state.x), window.innerWidth - bounds.width);
+        }
+
+        if (state.y <= 0 || state.y + bounds.height >= window.innerHeight) {
+          state.vy *= -1;
+          state.y = Math.min(Math.max(0, state.y), window.innerHeight - bounds.height);
+        }
+
+        setPosition(state.x, state.y);
+        requestAnimationFrame(tick);
+      };
+
+      const repelFrom = (clientX, clientY) => {
+        const rect = dvd.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = centerX - clientX;
+        const dy = centerY - clientY;
+        const magnitude = Math.hypot(dx, dy) || 1;
+        const boost = 240;
+        state.vx = (dx / magnitude) * boost;
+        state.vy = (dy / magnitude) * boost;
+      };
+
+      const updateLetterOffsets = (clientX, clientY) => {
+        const rect = dvd.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+        const midY = rect.top + rect.height / 2;
+        const dx = clientX - midX;
+        const dy = clientY - midY;
+        const strength = 0.08;
+
+        [...word.children].forEach((letter, index) => {
+          const offset = (index - word.children.length / 2) * 0.6;
+          letter.style.setProperty("--mx", `${dx * strength + offset}px`);
+          letter.style.setProperty("--my", `${dy * strength}px`);
+          letter.style.setProperty("--r", `${dx * 0.01}deg`);
+        });
+      };
+
+      const shatterLetters = () => {
+        [...word.children].forEach((letter, index) => {
+          const angle = (index / word.children.length) * Math.PI * 2;
+          const distance = 80 + Math.random() * 80;
+          letter.style.setProperty("--sx", `${Math.cos(angle) * distance}px`);
+          letter.style.setProperty("--sy", `${Math.sin(angle) * distance}px`);
+          letter.style.setProperty("--sr", `${(Math.random() - 0.5) * 120}deg`);
+          letter.classList.remove("shatter");
+          void letter.offsetWidth;
+          letter.classList.add("shatter");
+        });
+      };
+
+      dvd.addEventListener("pointerdown", (event) => {
+        repelFrom(event.clientX, event.clientY);
+        shatterLetters();
+      });
+
+      dvd.addEventListener("pointermove", (event) => {
+        updateLetterOffsets(event.clientX, event.clientY);
+      });
+
+      dvd.addEventListener("pointerleave", () => {
+        updateLetterOffsets(0, 0);
+      });
+
+      dvd.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          const rect = dvd.getBoundingClientRect();
+          repelFrom(rect.left + rect.width / 2, rect.top + rect.height / 2);
+          shatterLetters();
+        }
+      });
+
+      window.addEventListener("pointermove", (event) => {
+        updateLetterOffsets(event.clientX, event.clientY);
+      });
+
+      window.addEventListener("resize", () => {
+        clampPosition();
+        setPosition(state.x, state.y);
+      });
+
+      prefersReduced.addEventListener("change", (event) => {
+        state.running = !event.matches;
+      });
+
+      buildLetters();
+      clampPosition();
+      setPosition(state.x, state.y);
+      requestAnimationFrame(tick);
+    </script>
   </body>
 </html>

@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  hashedPassword String
+  dob            String?
+  sex            String?
+  heightCm       Float?
+  startingWeight Float?
+  bodyFatPct     Float?
+  commuteMiles   Float?
+  glp1Flag       Boolean          @default(false)
+  equipmentCsv   String?
+  createdAt      DateTime         @default(now())
+  nutritionTarget NutritionTarget?
+  metrics        Metric[]
+  workoutSessions WorkoutSession[]
+  nutritionLogs  NutritionLog[]
+  checkins       WeeklyCheckin[]
+}
+
+model Metric {
+  id              String   @id @default(cuid())
+  userId          String
+  date            DateTime
+  steps           Int?
+  exerciseMinutes Int?
+  calories        Int?
+  protein         Float?
+  restingHr       Int?
+  weightKg        Float?
+  bodyFatPct      Float?
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model WorkoutTemplate {
+  id        String     @id @default(cuid())
+  code      String     @unique
+  name      String
+  exercises Exercise[]
+}
+
+model Exercise {
+  id                     String   @id @default(cuid())
+  templateId             String
+  name                   String
+  equipment              String
+  sets                   Int
+  reps                   Int
+  restSec                Int
+  progressionIncrementKg Float @default(1.25)
+  template               WorkoutTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+}
+
+model WorkoutSession {
+  id          String   @id @default(cuid())
+  userId      String
+  templateId  String
+  date        DateTime
+  notes       String?
+  soreness    Int?
+  completed   Boolean  @default(false)
+  setsData    String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model NutritionTarget {
+  id       String @id @default(cuid())
+  userId   String @unique
+  calories Int    @default(2050)
+  protein  Float  @default(115)
+  carbs    Float?
+  fat      Float?
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model NutritionLog {
+  id       String   @id @default(cuid())
+  userId   String
+  date     DateTime
+  calories Int
+  protein  Float
+  carbs    Float
+  fat      Float
+  source   String   @default("manual")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model WeeklyCheckin {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime
+  waistCm     Float?
+  pushupMax   Int?
+  plankSec    Int?
+  photoUrl    String?
+  notes       String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
